@@ -1,0 +1,4 @@
+kind: Role
+metadata:
+  name: developer
+  namespace: demo

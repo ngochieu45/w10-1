@@ -1,0 +1,10 @@
+kind: RoleBinding
+metadata:
+  name: alice-developer
+  namespace: demo
+subjects:
+- kind: User
+  name: alice
+roleRef:
+  kind: Role
+  name: developer
