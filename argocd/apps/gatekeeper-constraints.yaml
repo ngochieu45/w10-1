@@ -10,7 +10,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/ngochieu45/w10-1.git
-    path: gatekeeper/constraint
+    path: gatekeeper/constraints
     targetRevision: main
   destination:
     server: https://kubernetes.default.svc
