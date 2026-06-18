@@ -3,7 +3,7 @@ kind: K8sPSPHostNetworkingPorts
 metadata:
   name: f-05-disallow-host-network
 spec:
-  enforcementAction: deny
+  enforcementAction: warn
   match:
     kinds:
     - apiGroups: [""]

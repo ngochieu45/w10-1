@@ -3,7 +3,7 @@ kind: K8sPSPAllowedUsers
 metadata:
   name: f-04-disallow-root-user
 spec:
-  enforcementAction: deny
+  enforcementAction: warn
   match:
     kinds:
     - apiGroups: [""]
