@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-pass
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx-pass
+  template:
+    metadata:
+      labels:
+        app: nginx-pass
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
