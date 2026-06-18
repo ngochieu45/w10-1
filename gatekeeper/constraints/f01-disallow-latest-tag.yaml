@@ -3,7 +3,7 @@ kind: K8sDisallowedTags
 metadata:
   name: f-01-disallow-latest-tag
 spec:
-  enforcementAction: warn
+  enforcementAction: deny
   match:
     kinds:
     - apiGroups: [""]
