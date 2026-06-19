@@ -10,7 +10,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/<YOUR_ORG>/<YOUR_REPO>.git   # đổi URL repo của bạn
+    repoURL: https://github.com/ngochieu45/w10-1.git   # đổi URL repo của bạn
     targetRevision: main
     path: policies
   destination:
