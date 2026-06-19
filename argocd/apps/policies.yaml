@@ -4,13 +4,14 @@ metadata:
   name: image-policies
   namespace: argocd
   annotations:
-    # Wave 2: chạy SAU policy-controller (wave 1) đã Healthy
-    # ArgoCD đợi Helm chart Healthy (CRD tồn tại) rồi mới sang wave này
+    # sync-wave trên app con KHÔNG có tác dụng giữa 2 app độc lập.
+    # Thay vào đó: dùng automated.prune=false + retry để
+    # image-policies tự retry cho đến khi CRD của policy-controller ready.
     argocd.argoproj.io/sync-wave: "2"
 spec:
   project: default
   source:
-    repoURL: https://github.com/ngochieu45/w10-1.git   # đổi URL repo của bạn
+    repoURL: https://github.com/ngochieu45/w10-1.git
     targetRevision: main
     path: policies
   destination:
@@ -22,11 +23,11 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      - SkipDryRunOnMissingResource=true
+      - SkipDryRunOnMissingResource=true   # ← key fix: bỏ qua dry-run khi CRD chưa có
       - ServerSideApply=true
     retry:
-      limit: 5           
+      limit: 10
       backoff:
-        duration: 10s    
-        factor: 2       
-        maxDuration: 2m
+        duration: 20s
+        factor: 2
+        maxDuration: 5m
