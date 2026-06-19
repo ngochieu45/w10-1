@@ -1,4 +1,5 @@
 # Build and push Docker image to GitHub Container Registry
+# Lab 2.2: tích hợp Trivy scan + Cosign sign vào pipeline gốc
 name: Build and Push Image
 
 on:
@@ -20,6 +21,7 @@ jobs:
     permissions:
       contents: write
       packages: write
+      id-token: write   # cần cho Cosign (OIDC token khi verify)
 
     steps:
       - name: Checkout repository
@@ -62,6 +64,41 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+      # ── Lab 2.2a · Trivy scan ────────────────────────────────────────────
+      # Scan image vừa push. Fail CI nếu có CVE HIGH hoặc CRITICAL.
+      # Nếu CVE chưa có patch từ vendor → thêm vào .trivyignore + lập ADR
+      # theo mẫu runbooks/ADR-001-cve-exception.md
+      - name: Scan image with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.semver.outputs.version }}
+          format: table
+          severity: HIGH,CRITICAL
+          exit-code: '1'
+          ignore-unfixed: false
+          vuln-type: os,library
+          trivyignores: .trivyignore   # file exception ADR (để trống nếu không dùng)
+
+      # ── Lab 2.2b · Cosign sign ───────────────────────────────────────────
+      # Ký đúng tag semver mà rollout.yaml sẽ dùng (không chỉ ký :latest).
+      # COSIGN_PRIVATE_KEY: nội dung file cosign.key → GitHub Secret
+      # COSIGN_PASSWORD   : passphrase khi tạo key    → GitHub Secret
+      # Public key commit tại: signing/cosign.pub (và dán vào ClusterImagePolicy)
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3
+        with:
+          cosign-release: 'v2.2.4'
+
+      - name: Sign image with Cosign
+        run: |
+          cosign sign --yes \
+            --key env://COSIGN_PRIVATE_KEY \
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.semver.outputs.version }}
+        env:
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+
+      # ── Cập nhật rollout.yaml + git tag (giữ nguyên logic gốc) ──────────
       - name: Update rollout.yaml with new version
         run: |
           sed -i "s|image: ghcr.io/.*/w10-api:.*|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.semver.outputs.version }}|g" app-api/rollout.yaml

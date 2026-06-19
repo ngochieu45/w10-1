@@ -1,0 +1,22 @@
+apiVersion: policy.sigstore.dev/v1beta1
+kind: ClusterImagePolicy
+metadata:
+  name: require-cosign-signature
+spec:
+  # Áp dụng cho tất cả image trong registry của bạn
+  # Điều chỉnh glob pattern cho đúng registry / repo
+  images:
+    - glob: "docker.io/<YOUR_DOCKERHUB_USERNAME>/api*"
+    # Nếu dùng ECR:  "123456789.dkr.ecr.ap-southeast-1.amazonaws.com/api*"
+    # Nếu dùng GHCR: "ghcr.io/<ORG>/api*"
+
+  authorities:
+    - name: cosign-key
+      key:
+        # Dán nội dung file signing/cosign.pub vào đây
+        # cosign generate-key-pair  →  copy cosign.pub
+        data: |
+          -----BEGIN PUBLIC KEY-----
+          MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEcAWaVnO/4Yem0jd17ePxsot2IBVX
+          ac3dw50090BZzyI08pAuKxF3LVDfcQKnN1lkiZiTtREaE5qzeFpr5l9IlA==
+          -----END PUBLIC KEY-----
