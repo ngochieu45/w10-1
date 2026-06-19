@@ -4,11 +4,13 @@ metadata:
   name: image-policies
   namespace: argocd
   annotations:
+    # Wave 2: chạy SAU policy-controller (wave 1) đã Healthy
+    # ArgoCD đợi Helm chart Healthy (CRD tồn tại) rồi mới sang wave này
     argocd.argoproj.io/sync-wave: "2"
 spec:
   project: default
   source:
-    repoURL: https://github.com/ngochieu45/w10-1.git
+    repoURL: https://github.com/<YOUR_ORG>/<YOUR_REPO>.git   # đổi URL repo của bạn
     targetRevision: main
     path: policies
   destination:
@@ -20,3 +22,11 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - SkipDryRunOnMissingResource=true
+      - ServerSideApply=true
+    retry:
+      limit: 5           
+      backoff:
+        duration: 10s    
+        factor: 2       
+        maxDuration: 2m
