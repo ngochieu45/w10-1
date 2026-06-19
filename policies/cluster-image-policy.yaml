@@ -6,7 +6,7 @@ spec:
   # Áp dụng cho tất cả image trong registry của bạn
   # Điều chỉnh glob pattern cho đúng registry / repo
   images:
-    - glob: "docker.io/<YOUR_DOCKERHUB_USERNAME>/api*"
+    - glob: "ghcr.io/**"
     # Nếu dùng ECR:  "123456789.dkr.ecr.ap-southeast-1.amazonaws.com/api*"
     # Nếu dùng GHCR: "ghcr.io/<ORG>/api*"
 
