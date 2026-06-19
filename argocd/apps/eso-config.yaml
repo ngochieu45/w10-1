@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: https://github.com/ngochieu45/w10-1.git
     path: eso
-    targetRevision: HEAD
+    targetRevision: main
   destination:
     server: https://kubernetes.default.svc
     namespace: demo
